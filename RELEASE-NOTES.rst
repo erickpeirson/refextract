@@ -1,20 +1,18 @@
-===================================
- refextract v0.1.0 is released
-===================================
+==============================
+ refextract v0.2.2 is released
+==============================
 
-refextract v0.1.0 was released on 2016-01-12
+refextract v0.2.2 was released on 2017-07-17.
 
 About
 -----
 
 Small library for extracting references used in scholarly communication.
 
-
 What's new
 ----------
 
-- Initial standalone release.
-
+- Handle pyPDF2 internal errors.
 
 Installation
 ------------
