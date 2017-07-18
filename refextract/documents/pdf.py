@@ -45,6 +45,14 @@ from six import iteritems
 from ..references.config import CFG_PATH_PDFTOTEXT
 from ..references.errors import GarbageFullTextError
 
+import logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
+    level=logging.ERROR
+)
+logger = logging.getLogger(__name__)
+
+
 # a dictionary of undesirable characters and their replacements:
 UNDESIRABLE_CHAR_REPLACEMENTS = {
     # Control characters not allowed in XML:
@@ -463,9 +471,9 @@ def pdftotext_conversion_is_bad(txtlines):
     # Numbers of 'words' and 'whitespaces' found in document:
     numWords = numSpaces = 0
     # whitespace character pattern:
-    p_space = re.compile(unicode(r'(\s)'), re.UNICODE)
+    p_space = re.compile(r'(\s)', re.UNICODE)
     # non-whitespace 'word' pattern:
-    p_noSpace = re.compile(unicode(r'(\S+)'), re.UNICODE)
+    p_noSpace = re.compile(r'(\S+)', re.UNICODE)
     for txtline in txtlines:
         numWords = numWords + len(p_noSpace.findall(txtline.strip()))
         numSpaces = numSpaces + len(p_space.findall(txtline.strip()))
@@ -498,11 +506,11 @@ def convert_PDF_to_plaintext(fpath, keep_layout=False):
     # If this pattern is matched, we want to split the page-break into
     # its own line because we rely upon this for trying to strip headers
     # and footers, and for some other pattern matching.
-    p_break_in_line = re.compile(ur'^\s*\f(.+)$', re.UNICODE)
+    p_break_in_line = re.compile(r'^\s*\f(.+)$', re.UNICODE)
     # build pdftotext command:
     cmd_pdftotext = [CFG_PATH_PDFTOTEXT, layout_option, "-q",
                      "-enc", "UTF-8", fpath, "-"]
-    print("* %s" % ' '.join(cmd_pdftotext))
+    logger.debug("* %s" % ' '.join(cmd_pdftotext))
     # open pipe to pdftotext:
     pipe_pdftotext = subprocess.Popen(cmd_pdftotext, stdout=subprocess.PIPE)
 
@@ -521,7 +529,7 @@ def convert_PDF_to_plaintext(fpath, keep_layout=False):
             doclines.append(u"\f")
             doclines.append(m_break_in_line.group(1))
 
-    print("* convert_PDF_to_plaintext found: "
+    logger.debug("* convert_PDF_to_plaintext found: "
           "%s lines of text" % len(doclines))
 
     # finally, check conversion result not bad:

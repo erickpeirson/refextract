@@ -72,6 +72,14 @@ from .regexs import (
     re_hdl)
 from ..version import __version__ as version
 
+import logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
+    level=logging.ERROR
+)
+logger = logging.getLogger(__name__)
+
+
 
 description = """
 Refextract tries to extract the reference section from a full-text document.
@@ -172,7 +180,7 @@ def format_report_number(citation_elements):
 
     e.g. CERN-LCHH2003-01 to CERN-LHCC-2003-01
     """
-    re_report = re.compile(ur'^(?P<name>[A-Z-]+)(?P<nums>[\d-]+)$', re.UNICODE)
+    re_report = re.compile(r'^(?P<name>[A-Z-]+)(?P<nums>[\d-]+)$', re.UNICODE)
     for el in citation_elements:
         if el['type'] == 'REPORTNUMBER':
             m = re_report.match(el['report_num'])
@@ -271,7 +279,7 @@ def mangle_volume(citation_elements):
 
     e.g. transforms 100B to B100
     """
-    volume_re = re.compile(ur"(\d+)([A-Z])", re.U | re.I)
+    volume_re = re.compile(r"(\d+)([A-Z])", re.U | re.I)
     for el in citation_elements:
         if el['type'] == 'JOURNAL':
             matches = volume_re.match(el['volume'])
@@ -627,12 +635,12 @@ def look_for_hdl_urls(citation_elements):
 # End of elements transformations
 
 def print_citations(splitted_citations, line_marker):
-    print('* splitted_citations')
-    print('  * line marker %s' % line_marker)
+    logger.debug('* splitted_citations')
+    logger.debug('  * line marker %s' % line_marker)
     for citation in splitted_citations:
-        print("  * elements")
+        logger.debug("  * elements")
         for el in citation:
-            print('    * %s %s' % (el['type'], repr(el)))
+            logger.debug('    * %s %s' % (el['type'], repr(el)))
 
 
 def parse_reference_line(ref_line, kbs, bad_titles_count={}, linker_callback=None):
@@ -653,7 +661,7 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}, linker_callback=Non
                                                        bad_titles_count)
 
     # Debug print tagging (authors, titles, volumes, etc.)
-    print('* tags %r' % tagged_line)
+    logger.debug('* tags %r' % tagged_line)
 
     # Using the recorded information, create a MARC XML representation
     # of the rebuilt line:
@@ -737,7 +745,7 @@ def search_for_book_in_misc(citation, kbs):
     """
     citation_year = year_from_citation(citation)
     for citation_element in citation:
-        print('* Searching for book title in: %s' % citation_element['misc_txt'])
+        logger.debug('* Searching for book title in: %s' % citation_element['misc_txt'])
         for title in kbs['books']:
             startIndex = find_substring_ignore_special_chars(citation_element['misc_txt'], title)
             if startIndex != -1:
@@ -761,7 +769,7 @@ def search_for_book_in_misc(citation, kbs):
                             book_found = True
 
                     if book_found:
-                        print('* Book found: %s' % title)
+                        logger.debug('* Book found: %s' % title)
                         book_element = {'type': 'BOOK',
                                         'misc_txt': '',
                                         'authors': book_authors,
@@ -773,7 +781,7 @@ def search_for_book_in_misc(citation, kbs):
                         citation_element['misc_txt'] = remove_year(citation_element['misc_txt'], book_year)
                         return True
 
-        print('  * Book not found!')
+        logger.debug('  * Book not found!')
 
     return False
 
@@ -1368,7 +1376,7 @@ def remove_leading_garbage_lines_from_reference_section(ref_sectn):
        @return: (list) of strings - the reference section without leading
         blank lines or email addresses.
     """
-    p_email = re.compile(ur'^\s*e\-?mail', re.UNICODE)
+    p_email = re.compile(r'^\s*e\-?mail', re.UNICODE)
     while ref_sectn and (ref_sectn[0].isspace() or p_email.match(ref_sectn[0])):
         ref_sectn.pop(0)
     return ref_sectn

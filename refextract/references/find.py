@@ -36,6 +36,14 @@ from .regexs import \
     re_reference_line_number_markers, \
     re_num
 
+import logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
+    level=logging.ERROR
+)
+logger = logging.getLogger(__name__)
+
+
 
 def find_reference_section(docbody):
     """Search in document body for its reference section.
@@ -498,10 +506,10 @@ def get_reference_section_beginning(fulltext):
                     sect_start['how_found_start'] = 4
 
     if sect_start:
-        print('* title %r' % sect_start['title_string'])
-        print('* marker %r' % sect_start['marker'])
-        print('* title_marker_same_line %s'
+        logger.debug('* title %r' % sect_start['title_string'])
+        logger.debug('* marker %r' % sect_start['marker'])
+        logger.debug('* title_marker_same_line %s'
               % sect_start['title_marker_same_line'])
     else:
-        print('* could not find references section')
+        logger.debug('* could not find references section')
     return sect_start

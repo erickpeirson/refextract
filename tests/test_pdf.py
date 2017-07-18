@@ -123,7 +123,7 @@ def test_extract_texkeys_from_pdf(pdf_files):
             u'ATLAScollaboration:2015uw',
             u'CMSCollaboration:2014ke',
             u'ATLAScollaboration:2015ue',
-            u'ATLAScollaboration:2014ur'
+            u'ATLAScollaboration:2014r'
             ]
     assert two_col_keys == expected
 
