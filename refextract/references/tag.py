@@ -23,7 +23,10 @@
 
 import re
 from functools import cmp_to_key
-from urllib.parse import unquote
+try:
+    from urlparse import unquote
+except ImportError:
+    from urllib.parse import unquote
 
 from unidecode import unidecode
 
